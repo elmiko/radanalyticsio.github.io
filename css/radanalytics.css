@@ -76,3 +76,7 @@ div.sidebarblock > div.content > div.title {
     font-weight: 400;
     margin-bottom: 10px;
 }
+
+div.literalblock {
+    margin-bottom: 2em;
+}
