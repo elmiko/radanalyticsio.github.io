@@ -60,12 +60,11 @@ if __name__ == "__main__":
     app.run(host='0.0.0.0', port=port)
 ....
 
-Your project directory should now look like this (note this is not showing the Git files):
+Your project directory should now look like this:
 
 ....
-$ tree
-.
-└── app.py
+$ ls
+app.py
 ....
 
 == Analysis of the source code
@@ -172,13 +171,11 @@ Create a file named `requirements.txt` in the root of your project and add the f
 Flask==0.12.1
 ....
 
-Your project directory should now look like this (note this is not showing the Git files):
+Your project directory should now look like this:
 
 ....
-$ tree
-.
-├── app.py
-└── requirements.txt
+$ ls
+app.py  requirements.txt
 ....
 
 == Commit your code
