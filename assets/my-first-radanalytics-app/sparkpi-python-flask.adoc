@@ -12,7 +12,7 @@ You should already have the necessary prerequisites installed and configured, bu
 
 == Create the application source file
 
-This application is relatively compact and will only need a single file for the implementation we have chosen. By default, the Python language source-to-image builder will look for a file named `app.py` in the root of your repository as the entry point for the application. This can be modified by passing a parameter to the build command, but for now let's keep things simple and create this file.
+This application is relatively compact and will only need a single source file for the implementation we have chosen. By default, the Python language source-to-image builder will look for a file named `app.py` in the root of your repository as the entry point for the application. This can be modified by passing a parameter to the build command, but for now let's keep things simple and create this file.
 
 Into your new source file, you should place these contents:
 
