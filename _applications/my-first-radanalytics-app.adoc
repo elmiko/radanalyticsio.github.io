@@ -12,7 +12,7 @@
 
 In this tutorial you will build a microservice which will calculate an approximate value for https://en.wikipedia.org/wiki/Pi[Pi] when requested by HTTP. You will learn how to create applications which utilize Apache Spark and that are deployed directly from a source repository to OpenShift with a single command.
 
-This tutorial will walk you through every step to creating, deploying and operating an Apache Spark driver application on OpenShift. You should expect to spend 30 to 60 minutes on these exercises, depending on your familiarity.
+This tutorial will walk you through every step of creating, deploying and operating an Apache Spark driver application on OpenShift. You should expect to spend 30 to 60 minutes on these exercises, depending on your familiarity.
 
 [[prerequisites]]
 == Prerequisites
@@ -31,7 +31,7 @@ With these in place you are ready to begin creating your microservice.
 [[overview]]
 == Application overview
 
-The SparkPi microservice that you will build during this tutorial is quite simple in its design and functionality. SparkPi is deployed as a single server pod and several Apache Spark pods. The microservice provides an HTTP server that will accept `GET` requests and respond with an estimation of Pi, it does this by utilizing Apache Spark to calculate the value using the https://en.wikipedia.org/wiki/Approximations_of_%CF%80#Summing_a_circle.27s_area[summing of a circle's area] technique.
+The SparkPi microservice that you will build during this tutorial is quite simple in its design and functionality. SparkPi is deployed as a single server pod and several Apache Spark pods. The microservice provides an HTTP server that will accept `GET` requests and respond with an estimation of Pi. It does this by utilizing Apache Spark to calculate the value using the https://en.wikipedia.org/wiki/Approximations_of_%CF%80#Summing_a_circle.27s_area[summing of a circle's area] technique.
 
 It is worth mentioning that in a normal environment you would not want to run extended calculations during an HTTP request unless they can be completed quickly. For the purposes of this tutorial however, it simplifies the implementation details. As you build further applications from the material provided here please keep this simplification of design in mind.
 
@@ -54,7 +54,7 @@ As https://docs.openshift.org/latest/architecture/core_concepts/builds_and_image
 [[setup]]
 == Setup your coding environment
 
-To utilize the source-to-image workflow you will need to have a https://git-scm.com[Git] repository to store your work. This repository is then used by the source-to-image builders to create the final application image which will be run on OpenShift. For the purposes of this tutorial your repository will need to be accessible by the OpenShift cluster, the easiest way to do this is by using an external service like https://github.com[GitHub] or https://bitbucket.com[BitBucket].
+To utilize the source-to-image workflow you will need to have a https://git-scm.com[Git] repository to store your work. This repository is then used by the source-to-image builders to create the final application image which will be run on OpenShift. For the purposes of this tutorial your repository will need to be accessible by the OpenShift cluster. The easiest way to do this is by using an external service like https://github.com[GitHub] or https://bitbucket.com[BitBucket].
 
 Create a new repository on your preferred platform and make a local clone of it, if you need help with this process there are instructions available in https://confluence.atlassian.com/get-started-with-bitbucket/create-a-repository-861178559.html[BitBucket's documentation] and https://help.github.com/articles/create-a-repo/[GitHub's documentation].
 
@@ -68,6 +68,7 @@ This tutorial has been developed for multiple languages and HTTP frameworks. Fun
 Each of these language specific tutorials provide instructions on how to structure your repository and what files to create. You will also learn how each microservice works and the commands necessary to build and launch them in OpenShift. Because the source-to-image templates that you will use are language specific, you must choose a single implementation to exist in your repository. When you are finished, return here to learn about interacting with your microservice and exposing it outside of OpenShift. Please choose one of the following language and framework options:
 
 * link:/assets/my-first-radanalytics-app/sparkpi-python-flask.html[Python with Flask]
+* link:/assets/my-first-radanalytics-app/sparkpi-scala-akka.html[Scala with Akka]
 
 [[user]]
 == Become a user
