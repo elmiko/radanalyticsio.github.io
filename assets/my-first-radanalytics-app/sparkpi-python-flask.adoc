@@ -38,8 +38,8 @@ def index():
 def sparkpi():
     spark = SparkSession.builder.appName("PythonPi").getOrCreate()
 
-    partitions = int(request.args.get('partitions', 2))
-    n = 100000 * partitions
+    scale = int(request.args.get('scale', 2))
+    n = 100000 * scale
 
     def f(_):
         x = random()
@@ -47,7 +47,7 @@ def sparkpi():
         return 1 if x ** 2 + y ** 2 <= 1 else 0
 
     count = spark.sparkContext.parallelize(
-        xrange(1, n + 1), partitions).map(f).reduce(add)
+        xrange(1, n + 1), scale).map(f).reduce(add)
     response = "Pi is roughly {}".format(4.0 * count / n)
 
     spark.stop()
@@ -113,8 +113,8 @@ spark = SparkSession.builder.appName("PythonPi").getOrCreate()
 As the algorithm we are using is dependent on creating a number of random samples, the next few lines setup the count of these samples. This application also uses a number of partitions to help distribute the workload. By default it will operate with only 2 partitions which results in 20,000 samples, but the user can increase these numbers by specifying the number of partitions. This option is achieved by using an argument parameter in the `GET` path. On the first line of this section, you can see that we use Flask's http://flask.pocoo.org/docs/0.12/api/#flask.Request[Request object] to detect if the user has requested a number of partitions. On the second line we then use that number of partitions to determine the number of samples we would like.
 
 ....
-partitions = int(request.args.get('partitions', 2))
-n = 100000 * partitions
+scale = int(request.args.get('scale', 2))
+n = 100000 * scale
 ....
 
 The method we are using to estimate Pi requires that we generate a number of random X,Y coordinate pairs and then determine if each pair is inside or outside the radius of a circle. To assist in this process we will create a function which can simply return a 1 or a 0 if a randomly generated pair is inside or outside of a radius, respectively. We begin by declaring a function `f`, since this function will get passed a value that we do not need we simply declare it's argument as `_`.
@@ -130,13 +130,13 @@ def f(_):
 
 With our random point method declared we can now use our session object to get access to the http://spark.apache.org/docs/latest/api/python/pyspark.html#pyspark.SparkContext[SparkContext]. The context object will allow us to run commands against our Apache Spark cluster.
 
-The `parallelize` function will create a resilient distributed dataset(RDD) from our input, which in this case is simply a range of numbers. The RDD we create will have a number of entries based on the value `n` we caluclated previously, and it will be split into a number of slices defined by our `partitions` variable. Partitioning the RDD will give us an added level of division for the work we are about to perform, Apache Spark can use this information to more thoroughly distribute the work over the cluster.
+The `parallelize` function will create a resilient distributed dataset(RDD) from our input, which in this case is simply a range of numbers. The RDD we create will have a number of entries based on the value `n` we caluclated previously, and it will be split into a number of slices defined by our `scale` variable. Partitioning the RDD will give us an added level of division for the work we are about to perform, Apache Spark can use this information to more thoroughly distribute the work over the cluster.
 
 After we have defined the RDD to operate on, we then call the `map` function to apply our random point function `f` against all elements in the RDD. We are not actually using the values from the RDD and only determining whether a point is inside our outside, this explains why `f` can ignore its input and only needs to return a 1 or 0. Finally, we `reduce` all the results in our RDD by adding them together. This will give us the count of points inside the circle.
 
 ....
 count = spark.sparkContext.parallelize(
-    xrange(1, n + 1), partitions).map(f).reduce(add)
+    xrange(1, n + 1), scale).map(f).reduce(add)
 ....
 
 Now that we have the number of random points inside the circle and we know the total number of samples, we can compute our estimate for Pi. This statement simply finds the ratio of points inside to outside the cirlce, then multiples that ratio by 4 to produce out estimate. We format that number into a human readable string that we will use for our response.
