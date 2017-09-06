@@ -102,10 +102,10 @@ $ curl http://`oc get routes/sparkpi --template='{{.spec.host}}'`/sparkpi
 Pi is roughly 3.140480
 ....
 
-You can see that our rough approximation is close, but not quite close enough. You can try adding the `partitions` parameter to your URL to see how it affects the outcome.
+You can see that our rough approximation is close, but not quite close enough. You can try adding the `scale` parameter to your URL to see how it affects the outcome.
 
 ....
-curl http://`oc get routes/sparkpi --template='{{.spec.host}}'`/sparkpi?partitions=5
+curl http://`oc get routes/sparkpi --template='{{.spec.host}}'`/sparkpi?scale=5
 ....
 
 [[explore]]
