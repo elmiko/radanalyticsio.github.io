@@ -132,7 +132,7 @@ With our random point method declared we can now use our session object to get a
 
 The `parallelize` function will create a resilient distributed dataset(RDD) from our input, which in this case is simply a range of numbers. The RDD we create will have a number of entries based on the value `n` we caluclated previously, and it will be split into a number of slices defined by our `scale` variable. Partitioning the RDD will give us an added level of division for the work we are about to perform, Apache Spark can use this information to more thoroughly distribute the work over the cluster.
 
-After we have defined the RDD to operate on, we then call the `map` function to apply our random point function `f` against all elements in the RDD. We are not actually using the values from the RDD and only determining whether a point is inside our outside, this explains why `f` can ignore its input and only needs to return a 1 or 0. Finally, we `reduce` all the results in our RDD by adding them together. This will give us the count of points inside the circle.
+After we have defined the RDD to operate on, we then call the `map` function to apply our random point function `f` against all elements in the RDD. We are not actually using the values from the RDD and only determining whether a point is inside or outside, this explains why `f` can ignore its input and only needs to return a 1 or 0. Finally, we `reduce` all the results in our RDD by adding them together. This will give us the count of points inside the circle.
 
 ....
 count = spark.sparkContext.parallelize(
@@ -241,7 +241,7 @@ A common task when building and running applications on OpenShift is to monitor 
 
 ....
 $ oc logs -f bc/sparkpi
-Cloning "https://github.com/elmiko/flask-pyspark-pi.git" ...
+Cloning "https://github.com/radanalyticsio/tutorial-sparkpi-python-flask.git" ...
         Commit: c8dbb96247c51ea8f13a7dfcf38fc37221378bbe (convert range to xrange)
         Author: Michael McCune <msm@redhat.com>
         Date:   Thu Aug 24 10:48:19 2017 -0400
