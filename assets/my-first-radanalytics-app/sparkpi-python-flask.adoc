@@ -69,7 +69,7 @@ app.py
 
 == Analysis of the source code
 
-Let us now take a look at the individual statements of the source file and breakdown what each section is doing.
+Let us now take a look at the individual statements of the source file and break down what each section is doing.
 
 At the beginning of the file we import the modules and classes that will be necessary for operation. You can see that we are including a few system modules, the Flask related pieces and the Spark session object.
 
@@ -139,7 +139,7 @@ count = spark.sparkContext.parallelize(
     xrange(1, n + 1), scale).map(f).reduce(add)
 ....
 
-Now that we have the number of random points inside the circle and we know the total number of samples, we can compute our estimate for Pi. This statement simply finds the ratio of points inside to outside the cirlce, then multiples that ratio by 4 to produce out estimate. We format that number into a human readable string that we will use for our response.
+Now that we have the number of random points inside the circle and we know the total number of samples, we can compute our estimate for Pi. This statement simply finds the ratio of points inside to outside the cirlce, then multiples that ratio by 4 to produce our estimate. We format that number into a human readable string that we will use for our response.
 
 ....
 response = "Pi is roughly {}".format(4.0 * count / n)
