@@ -1,0 +1,194 @@
+= SparkPi Scala Akka
+:page-layout: markdown
+:page-menu_template: menu_tutorial_application.html
+:page-menu_backurl: /applications/my-first-radanalytics-app
+:page-menu_backtext: Back to My First RADanalytics Application
+
+== Building SparkPi in Scala with Akka
+
+These instructions will help you to create a SparkPi microservice using the http://docs.scala-lang.org/[Scala language] and the https://akka.io[Akka framework]
+
+You should already have the necessary prerequisites installed and configured, but if not please review the link:/applications/my-first-radanalytics-app[instructions].
+
+== Create the application source file
+
+This application is relatively compact and will only need a single source file for the implementation we have chosen. If you are familiar with the structure of Scala language programs, you will know that the source files must be placed in the proper directories. To begin creating your source file, you will first need to create the directory structure for that file. In the root of the new directory that you made for this tutorial, run the following command to make that structure:
+
+....
+mkdir -p src/main/scala/io/radanalytics/examples/akka/sparkpi
+....
+
+Next create a file in that directory named `WebServerHttpApp.scala` and place the following contents into that file:
+
+....
+package io.radanalytics.examples.akka.sparkpi
+
+import akka.http.scaladsl.marshallers.xml.ScalaXmlSupport.defaultNodeSeqMarshaller
+import akka.http.scaladsl.server.{ HttpApp, Route }
+
+import scala.math.random
+import org.apache.spark.sql.SparkSession
+
+object WebServerHttpApp extends HttpApp with App {
+
+  def routes: Route =
+    pathEndOrSingleSlash {
+      complete("Scala Akka SparkPi server running. Add the 'sparkpi' route to this URL to invoke the app.")
+    } ~
+      path("sparkpi") {
+        get {
+          parameters("scale".as[Int] ? 2) { scale =>
+            val spark = SparkSession.builder.appName("Scala SparkPi WebApp").getOrCreate()
+            val n = math.min(100000L * scale, Int.MaxValue).toInt
+            val count = spark.sparkContext.parallelize(1 until n, scale).map { i =>
+              val x = random
+              val y = random
+              if (x * x + y * y < 1) 1 else 0
+            }.reduce(_ + _)
+            spark.stop()
+            complete("Pi is roughly " + 4.0 * count / (n - 1))
+          }
+        }
+      }
+
+  startServer("0.0.0.0", 8080)
+}
+....
+
+Your project directory should now look like this:
+
+....
+$ ls
+src
+
+$ find src -type f
+src/main/scala/io/radanalytics/examples/akka/sparkpi/WebServerHttpApp.scala
+....
+
+== Analysis of the source code
+
+Let us now take a look at the individual statements of the source file and break down what each section is doing.
+
+At the beginning of the file, the first thing we do is declare the package namespace for this source. After that we import a few packages and classes that will be needed: the Akka related pieces for our HTTP server, the Scala random package and the SparkSession class.
+
+....
+package io.radanalytics.examples.akka.sparkpi
+
+import akka.http.scaladsl.marshallers.xml.ScalaXmlSupport.defaultNodeSeqMarshaller
+import akka.http.scaladsl.server.{ HttpApp, Route }
+
+import scala.math.random
+import org.apache.spark.sql.SparkSession
+....
+
+The next statement declares the object that will contain our application, it extends the Akka http://doc.akka.io/api/akka-http/10.0.9/akka/http/scaladsl/server/HttpApp.html[HttpApp class] and utilizes Scala's http://www.scala-lang.org/api/2.11.8/#scala.App[App trait].
+
+....
+object WebServerHttpApp extends HttpApp with App {
+....
+
+The next step in our application is defining the HTTP endpoints. The Akka framework uses our `routes` function in conjunction with its http://doc.akka.io/docs/akka-http/current/scala/http/routing-dsl/directives/index.html[Directives] to form the core of the URL routing mechanism. In the first part of our function, we define the response for the root `/` endpoint using the http://doc.akka.io/api/akka-http/10.0.9/akka/http/scaladsl/server/directives/PathDirectives.html[pathEndOrSingleSlash] directive to simply return a static statement.
+
+....
+def routes: Route =
+  pathEndOrSingleSlash {
+    complete("Scala Akka SparkPi server running. Add the 'sparkpi' route to this URL to invoke the app.")
+  } ~
+....
+
+The next part of our `routes` function defines the real heart of this application. Let's take it apart in smaller pieces. On the first few lines we use the Akka directives to help define what HTTP requests we would like to process. On the first line we use the http://doc.akka.io/api/akka-http/10.0.9/akka/http/scaladsl/server/directives/PathDirectives.html[path] directive to match on the `sparkpi` endpoint for incoming URLs. Next we use the http://doc.akka.io/api/akka-http/10.0.9/akka/http/scaladsl/server/directives/MethodDirectives.html[get] directive to ensure that we only process HTTP `GET` requests. Lastly, the http://doc.akka.io/api/akka-http/10.0.9/akka/http/scaladsl/server/directives/ParameterDirectives.html[parameters] directive gives the ability to optionally process the `scale` query in our request path, with a default value of `2`.
+
+....
+path("sparkpi") {
+  get {
+    parameters("scale".as[Int] ? 2) { scale =>
+....
+
+The next statement simply aquires the https://spark.apache.org/docs/latest/api/python/pyspark.sql.html#pyspark.sql.SparkSession[SparkSession] object which will allow us to create processing instructions for and interact with the Apache Spark cluster.
+
+....
+val spark = SparkSession.builder.appName("Scala SparkPi WebApp").getOrCreate()
+....
+
+As the algorithm we are using is dependent on creating a number of random samples, the next line sets up this number. This application also uses a number of partitions to help distribute the workload. By default it will operate with only 2 partitions which results in 20,000 samples, but the user can increase these numbers by specifying the number of partitions with the `scale` parameter. We calculate the number of samples by multiplying the number of partitions (specified by our query parameter) with 10,000 and use the `math.min` function to ensure that we do not overflow our container type.
+
+....
+val n = math.min(100000L * scale, Int.MaxValue).toInt
+....
+
+The method we are using to estimate Pi requires that we generate a number of random X,Y coordinate pairs and then determine if each pair is inside or outside the radius of a circle. We have already determined the number of random pairs to generate, we will now use that number to distribute our workload of creating the random points and then determining if they are inside our imaginary circle.
+
+We start by using our session object to get access to the http://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.SparkContext[SparkContext]. The context object will allow us to run commands against our Apache Spark cluster.
+
+The `parallelize` function will create a resilient distributed dataset(RDD) from our input, which in this case is simply a range of numbers. The RDD we create will have a number of entries based on the value `n` we caluclated previously, and it will be split into a number of slices defined by our `scale` variable. Partitioning the RDD will give us an added level of division for the work we are about to perform, Apache Spark can use this information to more thoroughly distribute the work over the cluster.
+
+After we have defined the RDD to operate on, we then call the `map` function to apply our random point function against all elements in the RDD. We are not actually using the values from the RDD and are only using it as a count of the number of points to test. The test we perform is contained in the function that is passed to `map`.
+
+Our testing function will simply generate 2 random points using the http://www.scala-lang.org/api/2.11.8/index.html#scala.math.package@random:Double[scala.math.random] function to return a value between `0.0` and `1.0`. This is perfect for the calculations we want to do as we can assume our imaginary circle's radius is `1`. You can see after the function declaration, we declare our 2 random points and then return a value indicating if they are inside or outside of the radius.
+
+Finally, we `reduce` all the results in our RDD by adding them together. This will give us the count of points inside the circle.
+
+....
+val count = spark.sparkContext.parallelize(1 until n, scale).map { i =>
+  val x = random
+  val y = random
+  if (x * x + y * y < 1) 1 else 0
+}.reduce(_ + _)
+....
+
+Now that we have the number of random points inside the circle and we know the total number of samples, we can compute our estimate for Pi.
+
+The final things we do in our `sparkpi` endpoint function are to stop the session and then return our value. The last statement simply finds the ratio of points inside to outside the cirlce, then multiples that ratio by 4 to produce our estimate. We format that number into a human readable string that we will return for our response using Akka's `complete` function.
+
+....
+spark.stop()
+complete("Pi is roughly " + 4.0 * count / (n - 1))
+....
+
+The last significant line of our source file will start the Akka HTTP server listening on the host address and port we specify.
+
+....
+startServer("0.0.0.0", 8080)
+....
+
+== Add build files and dependencies
+
+To ensure that our source-to-image builder can properly assemble our source file into an application, it uses the http://www.scala-sbt.org/index.html[Scala Built Tool(sbt)]. We need to add a few files to our repository that will instruct sbt about the dependencies and tooling versions that are required to build our application.
+
+For an expanded explanation of the inner workings of these build files, please see the sbt reference manual's http://www.scala-sbt.org/0.13/docs/Basic-Def.html[Build definition] entry.
+
+The first file to create is named `build.sbt` and it is placed in the root of your project. Its contents will specify the dependencies and version numbers that our application requires.
+
+....
+lazy val akkaHttpVersion = "10.0.9"
+lazy val akkaVersion    = "2.5.3"
+
+lazy val root = (project in file(".")).
+  settings(
+    inThisBuild(List(
+      scalaHome       := Some(file("/opt/scala")),
+      scalaVersion    := "2.11.8",
+      organization    := "io.radanalytics.examples.akka.sparkpi"
+    )),
+    name := "tutorial-sparkpi-scala-akka",
+    version := "0.1",
+    mainClass in assembly := Some("io.radanalytics.examples.akka.sparkpi.WebServerHttpApp"),
+    libraryDependencies ++= Seq(
+      "com.typesafe.akka" %% "akka-http"         % akkaHttpVersion,
+      "com.typesafe.akka" %% "akka-http-xml"     % akkaHttpVersion,
+      "com.typesafe.akka" %% "akka-stream"       % akkaVersion,
+      "org.apache.spark"  %  "spark-sql_2.11"     % "2.1.0"  % "provided"
+    )
+  )
+....
+
+project/build.properties
+....
+sbt.version=0.13.13
+....
+
+project/plugins.sbt
+....
+addSbtPlugin("com.eed3si9n" % "sbt-assembly" % "0.14.5")
+addSbtPlugin("org.scalariform" % "sbt-scalariform" % "1.6.0")
+....
