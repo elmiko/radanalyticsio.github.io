@@ -3,15 +3,9 @@ radanalyticsio:
     url: /
   - title: Get Started
     url: /get-started
-  - title: My First App
-    url: /my-first-radanalytics-app.html
-  - title: Tutorials
-    url: /tutorials
+  - title: Solutions
+    url: /solutions
   - title: How Do I?
     url: /how-do-i
   - title: Community
     url: /community
-  - title: Projects
-    url: /projects
-  - title: FAQ
-    url: /faq

@@ -2,6 +2,7 @@
 :page-link: ophicleide
 :page-weight: 0
 :page-labels: [Python, MongoDB]
+:page-theme: Natural Language Processing
 :page-layout: application
 :page-menu_template: menu_tutorial_application.html
 :page-menu_items: lightning

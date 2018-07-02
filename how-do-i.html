@@ -14,7 +14,8 @@ menu_entry: How do I?
   <div class="col-lg-10 col-lg-offset-1">
     <div class="list-group list-view-pf list-view-pf-view">
 
-      {% for doc in site.howdoi %}
+      {% assign sorted_howdoi = site.howdoi | sort: 'title' %}
+      {% for doc in sorted_howdoi %}
       <div class="list-group-item">
         <div class="list-group-item-header flex-center">
           <div class="list-view-pf-expand">
@@ -24,7 +25,11 @@ menu_entry: How do I?
             <div class="list-view-pf-body">
               <div class="list-view-pf-description">
                 <div class="list-group-item-heading">
-                  <h2>{{ doc.title }}</h2>
+                  <h2 id="{{doc.url | remove_first: '/howdoi/'}}">{{ doc.title }}
+                    {% for label in doc.labels %}
+                    <span class="badge">{{ label }}</span>
+                    {% endfor %}
+                  </h2>
                 </div>
               </div>
             </div>
@@ -36,6 +41,7 @@ menu_entry: How do I?
           </div>
           <div>
             {{ doc.content }}
+            <a href="/how-do-i#{{doc.url | remove_first: '/howdoi/'}}">link to this article</a>
           </div>
         </div>
       </div>

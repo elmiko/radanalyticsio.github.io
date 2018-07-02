@@ -6,6 +6,47 @@ p.lead {
     font-size: 24px;
 }
 
+a.card {
+    color: rgb(54, 54, 54);
+}
+
+a.card:hover {
+    text-decoration: none;
+}
+
+div.center-text {
+    text-align: center;
+}
+
+div.card-height {
+    min-height: 300px;
+}
+
+span.theme {
+    display: inline-block;
+    min-width: 10px;
+    padding: 6px 14px;
+    font-size: 16px;
+    font-weight: 700;
+    color: #fff;
+    line-height: 1;
+    vertical-align: middle;
+    white-space: nowrap;
+    text-align: center;
+    background-color: #f39d3c;
+    border-radius: 1px;
+}
+
+div.solution-item {
+    border-top: 2px solid rgb(57, 165, 220);
+    border-bottom: 1px solid rgb(165, 165, 165);
+    border-left: 1px solid rgb(165, 165, 165);
+    border-right: 1px solid rgb(165, 165, 165);
+    padding-left: 1em;
+    padding-right: 1em;
+    margin-bottom: 1em;
+}
+
 div.features h3 {
     text-align: center;
 }

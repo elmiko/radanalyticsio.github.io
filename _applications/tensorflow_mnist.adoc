@@ -2,6 +2,7 @@
 :page-link: tensorflow_mnist
 :page-weight: 100
 :page-labels: [Tensorflow, S2I]
+:page-theme: Image Recognition Services
 :page-layout: application
 :page-menu_template: menu_tutorial_application.html
 :page-description: This demo shows how to use source-to-image Tensorflow Serving build to deploy a tensorflow serving prediction endpoint on Openshift. The s2i build provides a GRPC microservice endpoint for web applications to send queries to be evaluated against the tensorflow model.

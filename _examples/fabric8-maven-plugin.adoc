@@ -2,6 +2,7 @@
 :page-link: fabric8-maven-plugin
 :page-weight: 100
 :page-labels: [Java, Kafka]
+:page-theme: Automated Apache Spark Deployments
 :page-layout: application
 :page-menu_template: menu_tutorial_application.html
 :page-menu_items: lightning

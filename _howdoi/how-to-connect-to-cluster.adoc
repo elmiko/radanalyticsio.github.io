@@ -1,4 +1,5 @@
 = connect to a cluster to debug / develop?
+:page-labels: [Spark]
 
 [source,bash]
 oc run -it --rm dev-shell --image=radanalyticsio/openshift-spark -- spark-shell
